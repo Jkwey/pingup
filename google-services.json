@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "770513101627",
+    "project_id": "pingup-a5416",
+    "storage_bucket": "pingup-a5416.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:770513101627:android:d515f1b73356832a62cd1e",
+        "android_client_info": {
+          "package_name": "com.pingup.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBr4LnbyJmCu8KeySokQHEpxj6C9iO0h94"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
