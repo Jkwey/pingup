@@ -69,8 +69,7 @@
         }
       ],
       "expo-iap",
-      "@react-native-firebase/app",
-      "@react-native-firebase/auth"
+      "@react-native-firebase/app"
     ],
     "extra": {
       "eas": {
