@@ -13,8 +13,9 @@
       "backgroundColor": "#0C0A13"
     },
     "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": false,
-      "bundleIdentifier": "com.pingup.app",
+      "bundleIdentifier": "com.pingup.pingup",
       "buildNumber": "1",
       "deploymentTarget": "15.0",
       "infoPlist": {
@@ -28,6 +29,7 @@
       }
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "package": "com.pingup.app",
       "versionCode": 3,
       "adaptiveIcon": {
