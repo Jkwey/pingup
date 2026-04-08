@@ -4,7 +4,7 @@ import {
   StyleSheet, KeyboardAvoidingView, Platform, Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import auth from '@react-native-firebase/auth';
+import { Platform } from 'react-native';
 import { Colors } from '../constants/colors';
 import { useLocale } from '../hooks/useLocale';
 import { authAPI } from '../services/api';
@@ -66,16 +66,29 @@ export default function VerifyScreen({ phone, confirmationResult: initialConfirm
       return;
     }
     try {
-      const credential = await confirmation.confirm(fullCode);
-      const idToken = await credential.user.getIdToken();
-      const data = await authAPI.firebaseVerify(idToken);
-      if (!data.ok) {
-        const title = data.message?.includes('정지') ? '이용 정지' : '오류';
-        Alert.alert(title, data.message || '인증 실패');
-        return;
+      if (Platform.OS === 'android' && confirmation) {
+        // Android: Firebase
+        const credential = await confirmation.confirm(fullCode);
+        const idToken = await credential.user.getIdToken();
+        const data = await authAPI.firebaseVerify(idToken);
+        if (!data.ok) {
+          const title = data.message?.includes('정지') ? '이용 정지' : '오류';
+          Alert.alert(title, data.message || '인증 실패');
+          return;
+        }
+        await AsyncStorage.setItem('token', data.token);
+        onVerified(data.isNewUser);
+      } else {
+        // iOS: Twilio
+        const data = await authAPI.verify(phone, fullCode);
+        if (!data.ok) {
+          const title = data.message?.includes('정지') ? '이용 정지' : '오류';
+          Alert.alert(title, data.message || '인증 실패');
+          return;
+        }
+        await AsyncStorage.setItem('token', data.token);
+        onVerified(data.isNewUser);
       }
-      await AsyncStorage.setItem('token', data.token);
-      onVerified(data.isNewUser);
     } catch (e: any) {
       if (e.code === 'auth/invalid-verification-code') {
         Alert.alert('오류', '인증번호가 올바르지 않습니다');
@@ -87,8 +100,13 @@ export default function VerifyScreen({ phone, confirmationResult: initialConfirm
 
   const handleResend = async () => {
     try {
-      const newConfirmation = await auth().signInWithPhoneNumber(phone);
-      setConfirmation(newConfirmation);
+      if (Platform.OS === 'android') {
+        const firebaseAuth = require('@react-native-firebase/auth').default;
+        const newConfirmation = await firebaseAuth().signInWithPhoneNumber(phone);
+        setConfirmation(newConfirmation);
+      } else {
+        await authAPI.sendCode(phone);
+      }
       setTimer(180);
       setCanResend(false);
       setCode(['', '', '', '', '', '']);

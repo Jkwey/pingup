@@ -4,10 +4,10 @@ import {
   StyleSheet, KeyboardAvoidingView, Platform, Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import auth from '@react-native-firebase/auth';
 import { Colors } from '../constants/colors';
 import { useLocale } from '../hooks/useLocale';
 import { Locale } from '../constants/i18n';
+import { authAPI } from '../services/api';
 
 const COUNTRY_CODES: Record<Locale, { flag: string; code: string; digits: number }> = {
   ko: { flag: '🇰🇷', code: '+82',  digits: 11 },
@@ -46,11 +46,28 @@ export default function LoginScreen({ onNext }: Props) {
       return;
     }
     const fullPhone = `${country.code}${phone.replace(/[^0-9]/g, '')}`;
-    try {
-      const confirmation = await auth().signInWithPhoneNumber(fullPhone);
-      onNext(fullPhone, confirmation);
-    } catch (e: any) {
-      Alert.alert('오류', e.message || 'SMS 발송 실패');
+
+    if (Platform.OS === 'android') {
+      // Android: Firebase Phone Auth
+      try {
+        const firebaseAuth = require('@react-native-firebase/auth').default;
+        const confirmation = await firebaseAuth().signInWithPhoneNumber(fullPhone);
+        onNext(fullPhone, confirmation);
+      } catch (e: any) {
+        Alert.alert('오류', e.message || 'SMS 발송 실패');
+      }
+    } else {
+      // iOS: Twilio SMS
+      try {
+        const data = await authAPI.sendCode(fullPhone);
+        if (!data.ok) {
+          Alert.alert('오류', data.message || 'SMS 발송 실패');
+          return;
+        }
+        onNext(fullPhone, null);
+      } catch {
+        Alert.alert('오류', '서버 연결에 실패했습니다');
+      }
     }
   };
 
