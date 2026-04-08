@@ -4,7 +4,6 @@ import {
   StyleSheet, KeyboardAvoidingView, Platform, Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
 import { Colors } from '../constants/colors';
 import { useLocale } from '../hooks/useLocale';
 import { authAPI } from '../services/api';
