@@ -68,8 +68,7 @@
           "defaultChannel": "default"
         }
       ],
-      "expo-iap",
-      "@react-native-firebase/app"
+      "expo-iap"
     ],
     "extra": {
       "eas": {
